@@ -464,8 +464,8 @@ static TEE_Result sp_binary_open(const TEE_UUID *uuid,
 	return res;
 }
 
-static TEE_Result load_binary_sp(struct ts_session *s,
-				 struct user_mode_ctx *uctx)
+static TEE_Result __nopauth load_binary_sp(struct ts_session *s,
+					   struct user_mode_ctx *uctx)
 {
 	size_t bin_size = 0, bin_size_rounded = 0, bin_page_count = 0;
 	size_t bb_size = ROUNDUP(BOUNCE_BUFFER_SIZE, SMALL_PAGE_SIZE);
@@ -586,12 +586,13 @@ err:
 	return res;
 }
 
-static TEE_Result sp_open_session(struct sp_session **sess,
-				  struct sp_sessions_head *open_sessions,
-				  const TEE_UUID *ffa_uuid,
-				  const TEE_UUID *bin_uuid,
-				  const uint32_t boot_order,
-				  const void *fdt)
+static TEE_Result __nopauth
+sp_open_session(struct sp_session **sess,
+		struct sp_sessions_head *open_sessions,
+		const TEE_UUID *ffa_uuid,
+		const TEE_UUID *bin_uuid,
+		const uint32_t boot_order,
+		const void *fdt)
 {
 	TEE_Result res = TEE_SUCCESS;
 	struct sp_session *s = NULL;
@@ -1471,7 +1472,8 @@ static TEE_Result read_ffa_version(const void *fdt, struct sp_session *s)
 	return TEE_SUCCESS;
 }
 
-static TEE_Result sp_init_uuid(const TEE_UUID *bin_uuid, const void * const fdt)
+static TEE_Result __nopauth sp_init_uuid(const TEE_UUID *bin_uuid,
+					 const void *const fdt)
 {
 	TEE_Result res = TEE_SUCCESS;
 	struct sp_session *sess = NULL;
@@ -1517,7 +1519,7 @@ static TEE_Result sp_init_uuid(const TEE_UUID *bin_uuid, const void * const fdt)
 	return TEE_SUCCESS;
 }
 
-static TEE_Result sp_first_run(struct sp_session *sess)
+static TEE_Result __nopauth sp_first_run(struct sp_session *sess)
 {
 	TEE_Result res = TEE_SUCCESS;
 	struct thread_smc_args args = { };
@@ -1590,7 +1592,8 @@ out:
 	return res;
 }
 
-TEE_Result sp_enter(struct thread_smc_args *args, struct sp_session *sp)
+TEE_Result __nopauth sp_enter(struct thread_smc_args *args,
+			      struct sp_session *sp)
 {
 	TEE_Result res = TEE_SUCCESS;
 	struct sp_ctx *ctx = to_sp_ctx(sp->ts_sess.ctx);
@@ -1651,8 +1654,8 @@ static void sp_cpsr_configure_foreign_interrupts(struct sp_session *s,
 				    ARM32_CPSR_F_SHIFT);
 }
 
-static TEE_Result sp_enter_invoke_cmd(struct ts_session *s,
-				      uint32_t cmd __unused)
+static TEE_Result __nopauth sp_enter_invoke_cmd(struct ts_session *s,
+						uint32_t cmd __unused)
 {
 	struct sp_ctx *ctx = to_sp_ctx(s->ctx);
 	TEE_Result res = TEE_SUCCESS;
@@ -1897,7 +1900,7 @@ static void fip_sp_deinit_all(void)
 	}
 }
 
-static TEE_Result sp_init_all(void)
+static TEE_Result __nopauth sp_init_all(void)
 {
 	TEE_Result res = TEE_SUCCESS;
 	const struct sp_image *sp = NULL;

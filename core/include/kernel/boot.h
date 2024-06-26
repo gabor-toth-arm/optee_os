@@ -11,6 +11,21 @@
 #include <types_ext.h>
 
 /*
+ * Pauth keys change from atomic ones to thread ones during SP initialization.
+ * Pointer authentication must be disabled during this time or the functions
+ * will not be able to return.
+ */
+#if defined(CFG_CORE_PAUTH)
+#if defined(CFG_CORE_BTI)
+#define __nopauth __attribute__((target("branch-protection=bti")))
+#else
+#define __nopauth __attribute__((target("branch-protection=none")))
+#endif
+#else
+#define __nopauth
+#endif
+
+/*
  * struct boot_embdata - Embedded boot data
  * @total_len: Total length of the embedded boot data
  * @num_blobs: Number of blobs in the embedded boot data, always 2 even if
